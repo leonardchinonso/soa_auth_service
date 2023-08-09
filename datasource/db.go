@@ -25,7 +25,11 @@ type DatabaseContext struct {
 // InitDB initializes and initiates connection to the db
 // it pings the database to be sure it is up
 func InitDB(configMap *map[string]string) (*DatabaseContext, error) {
-	uri := fmt.Sprintf("%s%s", (*configMap)[config.BaseUri], (*configMap)[config.DatabaseName])
+	uri, err := getDatabaseURI(configMap)
+	if err != nil {
+		return nil, err
+	}
+
 	client, ctx, cancel, err := connectDatabase(uri)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open database: %v", err)
@@ -76,4 +80,17 @@ func ping(client *mongo.Client, ctx context.Context) error {
 	log.Printf("Connected to database client successfully\n")
 
 	return nil
+}
+
+// getDatabaseURI returns the database uri depending on the environment
+func getDatabaseURI(configMap *map[string]string) (string, error) {
+	env := (*configMap)[config.Environment]
+	switch env {
+	case "development":
+		return fmt.Sprintf("%s%s", (*configMap)[config.LocalDatabaseUri], (*configMap)[config.DatabaseName]), nil
+	case "staging":
+		return (*configMap)[config.AtlasDatabaseUri], nil
+	default:
+		return "", fmt.Errorf("invalid environment set: %s", env)
+	}
 }
