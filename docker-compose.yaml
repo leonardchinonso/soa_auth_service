@@ -1,0 +1,12 @@
+version: '3'
+services:
+  api:
+    container_name: soa_auth_service
+    image: alaooluwatobi/soa_auth_service:1
+    build: # Comment out build if not running compose from current directory.
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8080"
+    env_file:
+      - ./config/dev.env
