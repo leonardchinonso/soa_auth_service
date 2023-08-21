@@ -41,7 +41,7 @@ func getEnv(key string) (string, error) {
 
 // InitConfig loads the config variables into the application and populates the config map with the variables
 func InitConfig() (*map[string]string, error) {
-	// load values from the .env file into the application
+	// load values from the dev.env file into the application
 	if err := godotenv.Load("./config/dev.env"); err != nil {
 		return nil, fmt.Errorf("failed to load config variables: %v", err)
 	}
